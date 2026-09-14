@@ -1,0 +1,25 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    optionalDependencies:
+      '@rollup/rollup-win32-x64-msvc':
+        specifier: ^4.63.2
+        version: 4.63.2
+
+packages:
+
+  '@rollup/rollup-win32-x64-msvc@4.63.2':
+    resolution: {integrity: sha512-6NHnk/K3eq2ZFYcU1X8g67s9qIJRCOTT92gwLMVBp08dB2uuuwI1/Q/empzL2Bfr2f2WRLJVwpp90RmacQyFkw==}
+    cpu: [x64]
+    os: [win32]
+
+snapshots:
+
+  '@rollup/rollup-win32-x64-msvc@4.63.2':
+    optional: true

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Fetta"
+description = "A local-first AI engineering organization that understands software projects, coordinates specialist agents, verifies changes, and preserves project memory."
+version = "1.0.0"
+id = "artifacts/fetta"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21283
+
+[services.development]
+run = "pnpm --filter @workspace/fetta run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fetta", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/fetta/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21283"
+BASE_PATH = "/"

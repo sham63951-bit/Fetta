@@ -1,0 +1,489 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: projects
+    description: Project and repository operations
+  - name: organization
+    description: Agents, tasks, memory, and activity
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /projects/current:
+    get:
+      operationId: getCurrentProject
+      tags: [projects]
+      summary: Get the active project
+      responses:
+        "200":
+          description: Active project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /projects:
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project from a repository path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /projects/{projectId}/scan:
+    post:
+      operationId: scanProject
+      tags: [projects]
+      summary: Scan the repository and update its profile
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScanProjectInput"
+      responses:
+        "200":
+          description: Scanned project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /projects/{projectId}/overview:
+    get:
+      operationId: getProjectOverview
+      tags: [organization]
+      summary: Get the project brain overview
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Project overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectOverview"
+  /projects/{projectId}/agents:
+    get:
+      operationId: listAgents
+      tags: [organization]
+      summary: List project agents
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Agent definitions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Agent"
+  /projects/{projectId}/tasks:
+    get:
+      operationId: listTasks
+      tags: [organization]
+      summary: List project tasks
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [organization]
+      summary: Give Fetta an engineering objective
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+  /projects/{projectId}/tasks/{taskId}/run:
+    post:
+      operationId: runTask
+      tags: [organization]
+      summary: Start the first orchestration pass for a task
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+  /projects/{projectId}/memory:
+    get:
+      operationId: listMemory
+      tags: [organization]
+      summary: List project brain entries
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Memory entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemoryEntry"
+  /projects/{projectId}/events:
+    get:
+      operationId: listEvents
+      tags: [organization]
+      summary: List recent organizational activity
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Activity events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+  /projects/{projectId}/tasks/{taskId}/runs:
+    get:
+      operationId: listTaskRuns
+      tags: [organization]
+      summary: List agent runs for a task
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: Agent runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentRun"
+  /projects/{projectId}/runs/{runId}:
+    get:
+      operationId: getAgentRun
+      tags: [organization]
+      summary: Get detailed agent run information
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/RunId"
+      responses:
+        "200":
+          description: Agent run details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRun"
+        "404":
+          description: Agent run not found
+components:
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+    RunId:
+      name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Project:
+      type: object
+      required:
+        - id
+        - name
+        - repositoryPath
+        - status
+        - profile
+        - scanFingerprint
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        repositoryPath:
+          type: string
+        status:
+          type: string
+          enum: [initializing, ready, scanning, needs_attention]
+        profile:
+          $ref: "#/components/schemas/ProjectProfile"
+        scanFingerprint:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ProjectInput:
+      type: object
+      required: [name, repositoryPath]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        repositoryPath:
+          type: string
+          minLength: 1
+        scanProfile:
+          $ref: "#/components/schemas/ProjectProfile"
+        scanFingerprint:
+          type: string
+    ScanProjectInput:
+      type: object
+      properties:
+        scanProfile:
+          $ref: "#/components/schemas/ProjectProfile"
+        scanFingerprint:
+          type: string
+    ProjectProfile:
+      type: object
+      required: [language, framework, packageManager, branch, gitStatus, lastScan]
+      properties:
+        language:
+          type: string
+        framework:
+          type: string
+        packageManager:
+          type: string
+        branch:
+          type: string
+        gitStatus:
+          type: string
+        lastScan:
+          type: string
+    ProjectOverview:
+      type: object
+      required: [project, agentCount, memoryCount, activeTaskCount, completedTaskCount, openRiskCount]
+      properties:
+        project:
+          $ref: "#/components/schemas/Project"
+        agentCount:
+          type: integer
+        memoryCount:
+          type: integer
+        activeTaskCount:
+          type: integer
+        completedTaskCount:
+          type: integer
+        openRiskCount:
+          type: integer
+    Agent:
+      type: object
+      required: [id, name, role, description, status, currentActivity, accent]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [idle, ready, thinking, working, waiting, blocked, reviewing, verified, failed]
+        currentActivity:
+          type: string
+        accent:
+          type: string
+    Task:
+      type: object
+      required: [id, projectId, title, objective, ownerAgent, status, verificationState, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        title:
+          type: string
+        objective:
+          type: string
+        ownerAgent:
+          type: string
+        status:
+          type: string
+          enum: [planned, ready, running, waiting, blocked, review, verifying, completed, failed]
+        verificationState:
+          type: string
+          enum: [not_started, in_progress, passed, failed]
+        summary:
+          type: ["string", "null"]
+        verificationEvidence:
+          type: ["object", "null"]
+          properties:
+            passed:
+              type: boolean
+            evidence:
+              type: object
+              properties:
+                verificationType:
+                  type: string
+                command:
+                  type: string
+                exitCode:
+                  type: number
+                stdout:
+                  type: string
+                stderr:
+                  type: string
+                filesVerified:
+                  type: array
+                  items:
+                    type: string
+                timestamp:
+                  type: string
+            filesModified:
+              type: array
+              items:
+                type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    TaskInput:
+      type: object
+      required: [objective]
+      properties:
+        objective:
+          type: string
+          minLength: 1
+    MemoryEntry:
+      type: object
+      required: [id, type, title, content, source, confidence, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [fact, decision, constraint, convention, lesson, open_question, risk]
+        title:
+          type: string
+        content:
+          type: string
+        source:
+          type: string
+        confidence:
+          type: string
+          enum: [low, medium, high]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    Event:
+      type: object
+      required: [id, type, agent, message, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        agent:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+    AgentRun:
+      type: object
+      required: [id, projectId, taskId, agentId, agentName, status, startedAt]
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        taskId:
+          type: string
+        agentId:
+          type: string
+        agentName:
+          type: string
+        status:
+          type: string
+          enum: [running, completed, failed]
+        startedAt:
+          type: string
+        completedAt:
+          type: ["string", "null"]
+        input:
+          type: ["object", "null"]
+        output:
+          type: ["object", "null"]
+        error:
+          type: ["string", "null"]
+        metadata:
+          type: ["object", "null"]
+          properties:
+            model:
+              type: string
+            tokensUsed:
+              type: number
+            duration:
+              type: number
+
