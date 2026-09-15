@@ -19,7 +19,7 @@ export default defineConfig({
     minify: 'esbuild',
   },
   server: {
-    port: 3001,
+    port: Number(process.env.PORT) || 3001,
     host: true,
     proxy: {
       '/api': {

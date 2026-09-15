@@ -1,0 +1,105 @@
+Continue and FINISH the FETTA UI task.
+
+You are responsible for delivering a working, visually verified FETTA landing screen, not merely compiling the frontend.
+
+The current UI implementation is the priority. If the preview workflow has a configuration mismatch preventing visual verification, you may make the MINIMUM project configuration change required to get the existing frontend running in the managed preview.
+
+You have permission to fix:
+
+* frontend dev/preview configuration
+* package/workspace naming mismatch if genuinely required by the managed workflow
+* frontend asset paths
+* frontend UI code
+* CSS/styling
+* image loading
+* frontend-only configuration necessary to run the UI
+
+You do NOT have permission to:
+
+* redesign the backend
+* modify database/schema
+* modify APIs
+* modify Tauri/native functionality
+* redesign application architecture
+* install unrelated dependencies
+* refactor unrelated code
+* add fake agent functionality
+* build agent orchestration
+* change the product concept
+
+### UI target
+
+Build FETTA as a premium, cinematic AI engineering organization.
+
+The attached solar-system artwork is the visual foundation.
+
+The first screen should feel like:
+
+* dark
+* cinematic
+* intelligent
+* atmospheric
+* futuristic
+* premium
+* quiet
+* mysterious
+* powerful
+* trustworthy
+
+The solar system should be the dominant visual centerpiece.
+
+The planets represent FETTA's specialist engineering agents:
+
+* Architecture / Codebase
+* Database
+* Backend
+* Frontend
+* Security
+* Testing
+
+The central intelligence represents the coordinating/super agent.
+
+On the left, create the glassmorphic cylindrical/capsule-style control for selecting/opening a local codebase.
+
+FETTA branding should be understated and premium.
+
+Do NOT make this look like:
+
+* a SaaS dashboard
+* a CRM
+* an admin panel
+* a collection of cards
+* a generic AI landing page
+* cyberpunk
+* excessive neon
+* excessive gradients
+* a marketing website full of text
+
+Negative space is intentional.
+
+The solar-system visualization is the product interface, not a decorative hero image.
+
+### Critical requirement
+
+The UI must actually be visually verified in the running preview.
+
+Do not stop at "build passes."
+
+Workflow:
+
+1. Inspect only the minimum files needed.
+2. Finish the frontend UI.
+3. Fix the managed preview if necessary using the smallest justified configuration change.
+4. Start the preview.
+5. Visually inspect the rendered result.
+6. Make only UI corrections that materially improve the result.
+7. Verify the frontend builds.
+8. STOP.
+
+If you encounter a tooling/configuration problem, diagnose it and fix the minimum necessary thing rather than changing architecture.
+
+Do not endlessly troubleshoot.
+
+The definition of done is:
+
+**A running FETTA preview that visually looks like the intended FETTA product and has the requested codebase-selection UI.**
