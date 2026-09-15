@@ -1,0 +1,291 @@
+I want you to work on the **UI/UX design of FETTA only**.
+
+I am attaching a Canva reference/inspiration image. **Treat that image as the primary visual reference for the experience.** Do not reinterpret Fetta as a conventional SaaS dashboard, admin panel, CRM, or developer settings interface.
+
+## VERY IMPORTANT: USAGE / COST CONTROL
+
+Do NOT go through the entire codebase.
+
+Do NOT perform a broad architecture audit.
+
+Do NOT inspect unrelated files.
+
+Do NOT refactor the application.
+
+Do NOT rebuild existing backend functionality.
+
+Do NOT add unnecessary dependencies.
+
+Do NOT spend time understanding systems that are irrelevant to the visual interface.
+
+First inspect only the minimum files needed to identify the current frontend entry point and existing UI structure, then make the UI changes.
+
+Use as few tool calls and as little usage/credits as possible.
+
+This is primarily a **visual UX task**, not an engineering architecture task.
+
+---
+
+# WHAT IS FETTA?
+
+Product name:
+
+**FETTA**
+
+At this stage, Fetta is a **codebase understanding agent**.
+
+The developer gives Fetta a local codebase/repository.
+
+Fetta then deploys multiple specialist AI agents that rapidly understand different dimensions of the codebase.
+
+Think of Fetta as an **AI engineering organization**, not a chatbot.
+
+The agents behave conceptually like a solar system.
+
+### The solar system = the engineering organization
+
+The planets represent specialist agents.
+
+For example:
+
+* Database Agent → understands the database/schema
+* Codebase/Architecture Agent → understands the overall structure and architecture
+* Security Agent → understands security risks and implementation
+* Backend Agent → understands backend systems
+* Frontend Agent → understands frontend systems
+* Testing Agent → understands testing and reliability
+
+All of these specialist agents report into one central **Super Agent / Coordinator**.
+
+The Super Agent is the central intelligence.
+
+It has a very large context and persistent memory.
+
+Its defining characteristic is:
+
+**It does not forget what it has learned about the project.**
+
+The specialists investigate.
+
+The central intelligence synthesizes.
+
+The result is a living understanding of the entire codebase.
+
+---
+
+# THE FRONT PAGE
+
+The front page should NOT look like a normal software dashboard.
+
+It should feel like entering an **AI engineering universe**.
+
+The attached Canva image shows the intended visual direction.
+
+The primary visual element should be the **solar system image/artwork I attached**.
+
+It should dominate the screen.
+
+Think:
+
+**dark, cinematic, futuristic, intelligent, atmospheric, premium.**
+
+Not:
+
+* generic SaaS
+* corporate dashboard
+* excessive cards
+* tables everywhere
+* generic gradients
+* standard sidebar navigation
+* overly bright UI
+* clutter
+
+The solar system is not merely decorative.
+
+**It represents Fetta's agents.**
+
+The user should immediately understand:
+
+> "There is an entire engineering intelligence system inside this."
+
+---
+
+# FOLDER / CODEBASE ENTRY
+
+On the left side of the screen, there should be a prominent **glassmorphic cylindrical button/control**.
+
+Its primary purpose is:
+
+**Choose Codebase**
+
+or
+
+**Open Codebase**
+
+This is the main action on the landing screen.
+
+The control should feel like a physical futuristic object floating over the environment.
+
+Use:
+
+* glassmorphism
+* translucent surface
+* subtle blur
+* soft highlights
+* depth
+* restrained glow
+* premium typography
+
+Do NOT make it look like a normal HTML button.
+
+It should visually belong to the solar-system environment.
+
+When the developer chooses a folder/repository, this becomes the entry point into Fetta's understanding process.
+
+---
+
+# IMPORTANT UX PRINCIPLE
+
+Do not fill the landing screen with information just because there is empty space.
+
+**Negative space is intentional.**
+
+The solar system should have room to breathe.
+
+The interface should feel:
+
+**quiet → mysterious → intelligent → powerful**
+
+rather than:
+
+**busy → technical → dashboard-like**
+
+The first interaction should be extremely obvious:
+
+### Choose your codebase.
+
+Everything else can emerge after the codebase is selected.
+
+---
+
+# AFTER A CODEBASE IS SELECTED
+
+The UI should transition naturally from the landing state into an "understanding" state.
+
+The solar system metaphor should continue.
+
+The planets/agents can become active as Fetta begins understanding the project.
+
+For example:
+
+Database Agent becomes active while analyzing the database.
+
+Security Agent becomes active while analyzing security.
+
+Architecture Agent becomes active while mapping the codebase.
+
+Backend Agent becomes active while understanding backend services.
+
+The central Super Agent should visually communicate that it is **receiving and synthesizing their findings**.
+
+This should feel like an intelligence system coming online.
+
+Avoid conventional progress bars wherever possible.
+
+Prefer visual states such as:
+
+* agent awakening
+* scanning
+* analyzing
+* communicating
+* completed
+* reporting to central intelligence
+
+The exact animation can be subtle. Do not overdo it.
+
+---
+
+# VISUAL LANGUAGE
+
+Use the Canva reference as the strongest inspiration.
+
+The desired aesthetic is:
+
+**cinematic futuristic intelligence + glass + space + precision.**
+
+The UI should feel like something that could plausibly be the interface of an advanced AI engineering organization.
+
+Typography should be clean and modern.
+
+Spacing should be generous.
+
+Interactions should feel deliberate.
+
+Motion should be subtle and meaningful.
+
+No gimmicky sci-fi effects.
+
+No excessive neon.
+
+No cheesy "AI" visual clichés.
+
+No random glowing borders everywhere.
+
+No excessive gradients.
+
+No generic dashboard cards unless they genuinely serve the UX.
+
+---
+
+# FETTA BRANDING
+
+Use:
+
+**FETTA**
+
+as the product name.
+
+The branding should be understated and premium.
+
+Do not create a giant marketing-style logo/header.
+
+Fetta should feel like a serious developer tool.
+
+---
+
+# WHAT I WANT YOU TO DO
+
+1. Inspect only the minimum frontend files necessary.
+2. Understand the current landing/dashboard component.
+3. Rework the visual UX to match the attached Canva inspiration.
+4. Make the solar system the dominant visual centerpiece.
+5. Add the glassmorphic cylindrical codebase/folder selector on the left.
+6. Create the visual foundation for the agent/solar-system metaphor.
+7. Make the initial experience feel polished and intentional.
+8. Preserve existing functional code wherever possible.
+9. Do not touch backend functionality.
+10. Do not redesign unrelated application functionality.
+
+The goal is **not to build the entire Fetta product today.**
+
+The goal is to make the current Fetta interface look and feel like the beginning of the product described above.
+
+---
+
+# CRITICAL CONSTRAINT
+
+Before changing anything, inspect the attached Canva reference carefully.
+
+**Do not replace the visual concept with your own generic interpretation.**
+
+The Canva reference is the source of truth for the visual direction.
+
+Use your design judgment to translate that inspiration into a functioning desktop UI.
+
+Focus on:
+
+**composition → hierarchy → atmosphere → interaction → polish.**
+
+Do not spend credits investigating things that do not affect those five areas.
+
+When the UI work is complete, stop.
