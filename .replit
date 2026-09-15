@@ -6,3 +6,6 @@ packages = ["unzip"]
 [[ports]]
 localPort = 3001
 externalPort = 3001
+
+[deployment]
+deploymentTarget = "cloudrun"
