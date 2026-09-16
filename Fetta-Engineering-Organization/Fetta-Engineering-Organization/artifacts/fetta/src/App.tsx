@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const agents = [
   { name: 'Architecture', className: 'agent-architecture', accent: 'blue' },
@@ -7,21 +7,86 @@ const agents = [
   { name: 'Frontend', className: 'agent-frontend', accent: 'violet' },
 ];
 
+type MercuryStatus = {
+  ingestionId: string;
+  phase: 'UPLOADING' | 'VALIDATING' | 'EXTRACTING' | 'DISCOVERING' | 'INDEXING' | 'READY' | 'FAILED';
+  archiveBytes: number;
+  filesDiscovered: number;
+  filesIndexed: number;
+  filesIgnored: number;
+  expandedBytes: number;
+  elapsedMs: number;
+  throughputFilesPerSecond: number;
+  error?: string;
+};
+
 export function App() {
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [selectedArchive, setSelectedArchive] = useState<string | null>(null);
+  const [mercuryStatus, setMercuryStatus] = useState<MercuryStatus | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFolderSelect = () => {
+  const handleArchiveSelect = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const folderName = file.webkitRelativePath.split('/')[0] || 'Selected repository';
-    setSelectedFolder(folderName);
+    setSelectedArchive(file.name);
+    setUploadError(null);
+    setMercuryStatus(null);
+
+    try {
+      const response = await fetch('/api/mercury/ingest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': file.type || 'application/zip',
+          'X-Fetta-Archive-Name': file.name,
+        },
+        body: file,
+      });
+      const payload = await response.json() as { ingestionId?: string; error?: string };
+      if (!response.ok || !payload.ingestionId) {
+        throw new Error(payload.error || 'Mercury could not accept this archive.');
+      }
+      setMercuryStatus({
+        ingestionId: payload.ingestionId,
+        phase: 'VALIDATING',
+        archiveBytes: file.size,
+        filesDiscovered: 0,
+        filesIndexed: 0,
+        filesIgnored: 0,
+        expandedBytes: 0,
+        elapsedMs: 0,
+        throughputFilesPerSecond: 0,
+      });
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Mercury could not accept this archive.');
+    } finally {
+      event.target.value = '';
+    }
   };
+
+  useEffect(() => {
+    if (!mercuryStatus?.ingestionId || ['READY', 'FAILED'].includes(mercuryStatus.phase)) return;
+    const poll = window.setInterval(async () => {
+      try {
+        const response = await fetch(`/api/mercury/ingest/${mercuryStatus.ingestionId}`);
+        if (response.ok) setMercuryStatus(await response.json() as MercuryStatus);
+      } catch {
+        // A transient polling failure should not interrupt Mercury's server-side work.
+      }
+    }, 900);
+    return () => window.clearInterval(poll);
+  }, [mercuryStatus?.ingestionId, mercuryStatus?.phase]);
+
+  const phaseLabel = mercuryStatus?.phase === 'READY'
+    ? 'Repository ready'
+    : mercuryStatus?.phase
+      ? `Mercury ${mercuryStatus.phase.toLowerCase()}`
+      : 'Intelligence system ready';
 
   return (
     <main className="fetta-shell">
@@ -61,16 +126,16 @@ export function App() {
             <button
               className="codebase-button"
               type="button"
-              onClick={handleFolderSelect}
-              aria-label={selectedFolder ? `Change codebase: ${selectedFolder}` : 'Choose a codebase folder'}
+              onClick={handleArchiveSelect}
+              aria-label={selectedArchive ? `Change codebase archive: ${selectedArchive}` : 'Choose a codebase ZIP archive'}
             >
               <span className="button-glint" aria-hidden="true" />
               <span className="button-copy">
                 <span className="button-kicker">
-                  {selectedFolder ? 'Codebase connected' : 'Begin here'}
+                  {mercuryStatus?.phase === 'READY' ? 'Mercury complete' : selectedArchive ? 'Archive received' : 'Begin here'}
                 </span>
                 <span className="button-label">
-                  {selectedFolder ? selectedFolder : 'Choose codebase'}
+                  {selectedArchive ? selectedArchive : 'Choose repository ZIP'}
                 </span>
               </span>
               <span className="button-arrow" aria-hidden="true">
@@ -82,24 +147,21 @@ export function App() {
             <input
               ref={fileInputRef}
               type="file"
-              // @ts-expect-error webkitdirectory is supported by Chromium-based browsers.
-              webkitdirectory=""
-              directory=""
-              multiple
+              accept=".zip,application/zip,application/x-zip-compressed"
               onChange={handleFileChange}
-              aria-label="Choose a codebase folder"
+              aria-label="Choose a repository ZIP archive"
               className="sr-only"
             />
             <p className="control-hint">
-              {selectedFolder
-                ? 'Choose another folder to switch projects'
-                : 'Select a local repository to wake the organization'}
+              {uploadError || (selectedArchive
+                ? `${phaseLabel} · ${mercuryStatus?.filesIndexed ?? 0} files indexed`
+                : 'Select a repository ZIP to wake Mercury')}
             </p>
           </div>
 
           <div className="system-status">
             <span className="status-orb" aria-hidden="true" />
-            <span>{selectedFolder ? 'Repository ready to map' : 'Intelligence system ready'}</span>
+            <span>{phaseLabel}</span>
           </div>
 
           <div className="panel-footer">
@@ -114,7 +176,7 @@ export function App() {
             <span className="live-dot" />
             <span>Project brain</span>
             <span className="caption-divider" />
-            <span>{selectedFolder ? 'Listening' : 'Dormant'}</span>
+            <span>{mercuryStatus?.phase === 'READY' ? 'Listening' : 'Dormant'}</span>
           </div>
 
           <div className="orbit-map" aria-hidden="true">

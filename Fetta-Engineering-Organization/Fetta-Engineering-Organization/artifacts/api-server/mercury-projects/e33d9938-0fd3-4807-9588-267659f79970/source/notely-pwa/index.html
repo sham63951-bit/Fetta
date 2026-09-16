@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#e5dfd0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Notely">
+<title>Notely — Just Write</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#f5f0e8;
+  --paper-dark:#ede8dc;
+  --paper-deep:#e5dfd0;
+  --ink:#2c2416;
+  --ink-light:#5a5040;
+  --ink-faint:#9a9080;
+  --accent:#b5541c;
+  --accent-warm:#d4742a;
+  --line:rgba(44,36,22,0.10);
+  --shadow:0 2px 12px rgba(44,36,22,0.12);
+  --shadow-lg:0 8px 40px rgba(44,36,22,0.20);
+}
+html,body{height:100%;height:100dvh;overflow:hidden;background:var(--paper-dark);font-family:'Lora',Georgia,serif;color:var(--ink);}
+
+/* APP SHELL */
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden;}
+
+/* HEADER */
+#header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:54px;background:var(--paper-deep);border-bottom:1px solid var(--line);flex-shrink:0;}
+.brand{font-size:20px;font-weight:700;letter-spacing:-0.3px;}
+.brand span{color:var(--accent);}
+.header-btns{display:flex;gap:4px;}
+.icon-btn{background:none;border:none;padding:8px;cursor:pointer;color:var(--ink);border-radius:6px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;}
+.icon-btn:active{opacity:0.6;}
+
+/* VIEWS */
+#list-view,#editor-view{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+#list-view.hidden,#editor-view.hidden{display:none;}
+
+/* LIST */
+#notes-list{flex:1;overflow-y:auto;padding:8px 12px;-webkit-overflow-scrolling:touch;}
+.note-card{padding:14px 14px 12px;border-radius:8px;background:var(--paper);border:1px solid var(--line);margin-bottom:8px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;}
+.note-card:active{opacity:0.8;}
+.note-card-title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);}
+.note-card-preview{font-size:12.5px;color:var(--ink-faint);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic;}
+.note-card-meta{font-size:10.5px;color:var(--ink-faint);margin-top:6px;display:flex;align-items:center;gap:8px;}
+.note-card-del{position:absolute;top:12px;right:10px;background:none;border:none;padding:6px;cursor:pointer;color:var(--ink-faint);border-radius:4px;-webkit-tap-highlight-color:transparent;}
+.note-card-del:active{color:var(--accent);}
+.empty-state{padding:60px 20px;text-align:center;color:var(--ink-faint);font-style:italic;line-height:1.7;font-size:14px;}
+
+/* EDITOR HEADER */
+#editor-header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:48px;background:var(--paper-deep);border-bottom:1px solid var(--line);flex-shrink:0;}
+.back-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--accent);font-size:15px;cursor:pointer;padding:8px 0;font-family:'Lora',Georgia,serif;-webkit-tap-highlight-color:transparent;}
+.back-btn:active{opacity:0.6;}
+#save-indicator{font-size:10px;color:var(--ink-faint);}
+#save-indicator.saved{color:#7a9a5a;}
+
+/* TIMESTAMP */
+#timestamp-bar{padding:6px 18px;font-size:11px;color:var(--ink-faint);font-style:italic;background:var(--paper);flex-shrink:0;border-bottom:1px solid transparent;}
+#timestamp-bar.visible{border-bottom-color:var(--line);}
+
+/* EDITOR FIELDS */
+#note-title{width:100%;border:none;background:var(--paper);font-family:'Lora',Georgia,serif;font-size:22px;font-weight:700;color:var(--ink);padding:18px 18px 8px;outline:none;resize:none;line-height:1.3;flex-shrink:0;}
+#note-title::placeholder{color:var(--ink-faint);font-style:italic;font-weight:400;}
+#note-body{flex:1;width:100%;border:none;background:var(--paper);font-family:'Lora',Georgia,serif;font-size:16px;color:var(--ink-light);padding:8px 18px 80px;outline:none;resize:none;line-height:1.9;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#note-body::placeholder{color:var(--ink-faint);font-style:italic;}
+
+/* BOTTOM BAR */
+#bottom-bar{padding:8px 18px;background:var(--paper);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#word-count{font-size:10.5px;color:var(--ink-faint);}
+#del-note-btn{background:none;border:none;padding:6px;cursor:pointer;color:var(--ink-faint);border-radius:4px;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:4px;font-size:12px;font-family:'Lora',Georgia,serif;}
+#del-note-btn:active{color:var(--accent);}
+
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(44,36,22,0.4);z-index:200;align-items:flex-end;justify-content:center;padding:0;}
+#modal-overlay.open{display:flex;}
+#modal{background:var(--paper);border-radius:16px 16px 0 0;padding:28px 24px 40px;width:100%;max-width:480px;}
+.modal-handle{width:36px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-size:20px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--ink-faint);font-style:italic;margin-bottom:20px;}
+.modal-tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:18px;}
+.modal-tab{flex:1;background:none;border:none;padding:10px;font-size:13px;color:var(--ink-faint);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;font-family:'Lora',Georgia,serif;}
+.modal-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;color:var(--ink-faint);margin-bottom:5px;letter-spacing:0.08em;text-transform:uppercase;}
+.field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--paper-dark);font-size:16px;color:var(--ink);outline:none;font-family:'Lora',Georgia,serif;-webkit-appearance:none;}
+.field input:focus{border-color:var(--accent);}
+.modal-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:'Lora',Georgia,serif;margin-top:4px;}
+.modal-btn:active{opacity:0.85;}
+.modal-divider{text-align:center;font-size:11px;color:var(--ink-faint);margin:14px 0;font-style:italic;}
+.modal-guest{width:100%;padding:12px;background:none;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--ink-light);cursor:pointer;font-family:'Lora',Georgia,serif;}
+.modal-guest:active{border-color:var(--accent);color:var(--accent);}
+.auth-error{font-size:12px;color:var(--accent);margin-bottom:10px;font-style:italic;}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
+.user-info{font-size:13px;color:var(--ink-light);}
+.user-info strong{color:var(--accent);}
+.signout-btn{background:none;border:1px solid var(--line);padding:6px 14px;border-radius:6px;font-size:12px;color:var(--ink-light);cursor:pointer;font-family:'Lora',Georgia,serif;}
+
+/* INSTALL BANNER */
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);color:var(--paper);padding:14px 18px;z-index:300;align-items:center;justify-content:space-between;gap:12px;}
+#install-banner.show{display:flex;}
+#install-banner p{font-size:13px;line-height:1.4;}
+#install-banner strong{color:var(--accent-warm);}
+.install-btn{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:'Lora',Georgia,serif;flex-shrink:0;}
+.install-close{background:none;border:none;color:rgba(245,240,232,0.5);font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- HEADER -->
+  <div id="header">
+    <div class="brand">Notely<span>.</span></div>
+    <div class="header-btns">
+      <button class="icon-btn" id="account-btn" title="Account">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 19c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="new-btn" title="New note">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="list-view">
+    <div id="notes-list">
+      <div class="empty-state" id="empty-msg">No notes yet.<br>Tap + to begin.</div>
+    </div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="editor-view" class="hidden">
+    <div id="editor-header">
+      <button class="back-btn" id="back-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M12 4L7 9l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Notes
+      </button>
+      <span id="save-indicator">● saved</span>
+    </div>
+    <div id="timestamp-bar"></div>
+    <textarea id="note-title" placeholder="Untitled" rows="1"></textarea>
+    <textarea id="note-body" placeholder="Start writing…"></textarea>
+    <div id="bottom-bar">
+      <span id="word-count">0 words</span>
+      <button id="del-note-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3.5h10M5 3.5V2.5h4v1M5.5 6v5M8.5 6v5M3 3.5l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="modal-handle"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <p><strong>Install Notely</strong><br>Add to home screen for the best experience</p>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="install-close" id="install-close">✕</button>
+</div>
+
+<script>
+// ── STATE ──
+let notes = [];
+let activeId = null;
+let saveTimer = null;
+let startedAt = null;
+let user = null;
+let supabase = null;
+let authMode = 'signin';
+let deferredPrompt = null;
+
+// ── SUPABASE CONFIG ──
+// Replace these with your actual values
+const SUPABASE_URL = 'https://jaugoeuvnxnwotnhxgcl.supabase.co';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+// ── INIT SUPABASE ──
+async function initSupabase() {
+  const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+  supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const { data } = await supabase.auth.getSession();
+  if (data.session?.user) {
+    user = data.session.user;
+    await fetchCloud();
+  } else {
+    loadGuestNotes();
+  }
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    user = session?.user || null;
+    if (user) await fetchCloud();
+    else loadGuestNotes();
+  });
+}
+
+// ── GUEST STORAGE ──
+const GUEST_KEY = 'notely_notes';
+function loadGuestNotes() {
+  try { notes = JSON.parse(localStorage.getItem(GUEST_KEY) || '[]'); } catch { notes = []; }
+  renderList();
+  if (notes.length > 0) openNote(notes[0].id);
+}
+function saveGuestNotes() { localStorage.setItem(GUEST_KEY, JSON.stringify(notes)); }
+
+// ── CLOUD ──
+async function fetchCloud() {
+  if (!supabase || !user) return;
+  const { data } = await supabase.from('notes').select('*').eq('user_id', user.id).order('updated_at', { ascending: false });
+  notes = data || [];
+  renderList();
+  if (notes.length > 0) openNote(notes[0].id);
+}
+
+// ── RENDER LIST ──
+function renderList() {
+  const list = document.getElementById('notes-list');
+  const empty = document.getElementById('empty-msg');
+  if (notes.length === 0) {
+    list.innerHTML = '';
+    list.appendChild(empty);
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = '';
+  notes.forEach(n => {
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.dataset.id = n.id;
+    if (n.id === activeId) card.style.borderColor = 'var(--accent)';
+    const time = n.started_at ? `⏱ ${fmtTime(n.started_at)} · ` : '';
+    card.innerHTML = `
+      <div class="note-card-title">${esc(n.title) || 'Untitled'}</div>
+      <div class="note-card-preview">${esc(n.body.slice(0, 70)) || '—'}</div>
+      <div class="note-card-meta">${time}${fmtDate(n.updated_at)}</div>
+      <button class="note-card-del" data-id="${n.id}">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V3h4v1M5.5 6.5v4M8.5 6.5v4M3 4l.9 8h6.2l.9-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>`;
+    card.addEventListener('click', e => {
+      if (e.target.closest('.note-card-del')) { deleteNote(n.id); return; }
+      openNote(n.id);
+    });
+    list.appendChild(card);
+  });
+}
+
+// ── OPEN NOTE ──
+function openNote(id) {
+  activeId = id;
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  startedAt = note.started_at || null;
+  document.getElementById('note-title').value = note.title;
+  document.getElementById('note-body').value = note.body;
+  updateWordCount();
+  updateTimestamp();
+  setSaveStatus('saved');
+  showView('editor');
+  renderList();
+}
+
+// ── NEW NOTE ──
+async function newNote() {
+  const now = new Date().toISOString();
+  let note;
+  if (user && supabase) {
+    const { data } = await supabase.from('notes').insert({ user_id: user.id, title: '', body: '', started_at: now }).select().single();
+    note = data;
+    notes.unshift(note);
+  } else {
+    note = { id: Date.now().toString(), title: '', body: '', created_at: now, updated_at: now, started_at: now };
+    notes.unshift(note);
+    saveGuestNotes();
+  }
+  renderList();
+  openNote(note.id);
+  setTimeout(() => document.getElementById('note-title').focus(), 80);
+}
+
+// ── SAVE ──
+function scheduleSave() {
+  setSaveStatus('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(doSave, 800);
+}
+
+async function doSave() {
+  if (!activeId) return;
+  const title = document.getElementById('note-title').value;
+  const body = document.getElementById('note-body').value;
+  const now = new Date().toISOString();
+  notes = notes.map(n => n.id === activeId ? { ...n, title, body, started_at: startedAt, updated_at: now } : n);
+  if (user && supabase) {
+    await supabase.from('notes').update({ title, body, started_at: startedAt, updated_at: now }).eq('id', activeId).eq('user_id', user.id);
+  } else {
+    saveGuestNotes();
+  }
+  renderList();
+  setSaveStatus('saved');
+}
+
+// ── DELETE ──
+async function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  if (user && supabase) await supabase.from('notes').delete().eq('id', id).eq('user_id', user.id);
+  notes = notes.filter(n => n.id !== id);
+  if (!user) saveGuestNotes();
+  if (activeId === id) {
+    activeId = null;
+    if (notes.length > 0) openNote(notes[0].id);
+    else { showView('list'); }
+  }
+  renderList();
+}
+
+// ── TIMESTAMP ──
+function updateTimestamp() {
+  const bar = document.getElementById('timestamp-bar');
+  if (startedAt) {
+    bar.textContent = `⏱ Started ${fmtTime(startedAt)} · ${fmtFull(startedAt)}`;
+    bar.className = 'visible';
+  } else {
+    bar.textContent = '';
+    bar.className = '';
+  }
+}
+
+// ── UI HELPERS ──
+function showView(v) {
+  document.getElementById('list-view').classList.toggle('hidden', v !== 'list');
+  document.getElementById('editor-view').classList.toggle('hidden', v !== 'editor');
+}
+
+function setSaveStatus(s) {
+  const el = document.getElementById('save-indicator');
+  el.textContent = s === 'saved' ? '● saved' : '○ saving…';
+  el.className = s === 'saved' ? 'saved' : '';
+}
+
+function updateWordCount() {
+  const val = document.getElementById('note-body').value.trim();
+  const w = val ? val.split(/\s+/).length : 0;
+  document.getElementById('word-count').textContent = `${w} word${w !== 1 ? 's' : ''}`;
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(iso) {
+  const d = new Date(iso), diff = Date.now() - d.getTime();
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)}h ago`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function fmtTime(iso) { return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); }
+function fmtFull(iso) { return new Date(iso).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }); }
+
+// ── MODAL ──
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+  renderModal();
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function renderModal() {
+  const c = document.getElementById('modal-content');
+  if (user) {
+    c.innerHTML = `
+      <div class="modal-title">Account</div>
+      <div class="user-row">
+        <div class="user-info">Signed in as<br><strong>${user.email}</strong></div>
+        <button class="signout-btn" id="signout-btn">Sign out</button>
+      </div>`;
+    document.getElementById('signout-btn').onclick = async () => {
+      await supabase.auth.signOut();
+      closeModal();
+    };
+  } else {
+    c.innerHTML = `
+      <div class="modal-title">Welcome back.</div>
+      <div class="modal-sub">Your notes, wherever you are.</div>
+      <div class="modal-tabs">
+        <button class="modal-tab ${authMode==='signin'?'active':''}" id="tab-signin">Sign in</button>
+        <button class="modal-tab ${authMode==='signup'?'active':''}" id="tab-signup">Sign up</button>
+      </div>
+      <div id="auth-error" class="auth-error" style="display:none"></div>
+      <div class="field"><label>Email</label><input type="email" id="m-email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field"><label>Password</label><input type="password" id="m-pass" placeholder="••••••••" autocomplete="${authMode==='signup'?'new-password':'current-password'}"></div>
+      <button class="modal-btn" id="auth-submit">${authMode==='signin'?'Sign in':'Create account'}</button>
+      <div class="modal-divider">or</div>
+      <button class="modal-guest" id="guest-btn">Continue as guest — saves in this browser</button>`;
+    document.getElementById('tab-signin').onclick = () => { authMode='signin'; renderModal(); };
+    document.getElementById('tab-signup').onclick = () => { authMode='signup'; renderModal(); };
+    document.getElementById('guest-btn').onclick = closeModal;
+    document.getElementById('auth-submit').onclick = async () => {
+      const email = document.getElementById('m-email').value.trim();
+      const pass = document.getElementById('m-pass').value;
+      const errEl = document.getElementById('auth-error');
+      if (!email || !pass) { errEl.textContent='Please fill in all fields'; errEl.style.display='block'; return; }
+      const btn = document.getElementById('auth-submit');
+      btn.textContent = 'Loading…'; btn.disabled = true;
+      let error;
+      if (authMode === 'signup') { ({ error } = await supabase.auth.signUp({ email, password: pass })); }
+      else { ({ error } = await supabase.auth.signInWithPassword({ email, password: pass })); }
+      if (error) { errEl.textContent = error.message; errEl.style.display='block'; btn.textContent = authMode==='signin'?'Sign in':'Create account'; btn.disabled=false; return; }
+      closeModal();
+    };
+    document.getElementById('m-pass').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('auth-submit').click(); });
+  }
+}
+
+// ── EVENT LISTENERS ──
+document.getElementById('new-btn').onclick = newNote;
+document.getElementById('account-btn').onclick = openModal;
+document.getElementById('modal-overlay').onclick = e => { if(e.target === document.getElementById('modal-overlay')) closeModal(); };
+document.getElementById('back-btn').onclick = () => {
+  clearTimeout(saveTimer); doSave();
+  showView('list');
+};
+document.getElementById('del-note-btn').onclick = () => { if(activeId) deleteNote(activeId); };
+
+document.getElementById('note-title').addEventListener('input', function() {
+  if (!startedAt) { startedAt = new Date().toISOString(); updateTimestamp(); }
+  scheduleSave();
+});
+document.getElementById('note-title').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('note-body').focus(); }
+});
+document.getElementById('note-body').addEventListener('input', function() {
+  if (!startedAt) { startedAt = new Date().toISOString(); updateTimestamp(); }
+  updateWordCount();
+  scheduleSave();
+});
+
+// ── PWA INSTALL ──
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+document.getElementById('install-btn').onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.remove('show');
+};
+document.getElementById('install-close').onclick = () => {
+  document.getElementById('install-banner').classList.remove('show');
+};
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('show');
+});
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// ── START ──
+initSupabase();
+</script>
+</body>
+</html>

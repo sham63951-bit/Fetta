@@ -1,0 +1,68 @@
+[
+  {
+    "id": "c5fb850250c7443c48a6c12b5cf6916773da31f1",
+    "relativePath": "src/index.ts",
+    "filename": "index.ts",
+    "extension": ".ts",
+    "size": 26,
+    "contentHash": "a2098bd92b10bf8b816d24b7556b1ce8c49a879d130489065ef1051c17e042f6",
+    "language": "TypeScript",
+    "text": true,
+    "classification": "SOURCE",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  },
+  {
+    "id": "2b1fd5b3c21a90a60aceabba6129035f613b63b9",
+    "relativePath": "tests/index.test.ts",
+    "filename": "index.test.ts",
+    "extension": ".ts",
+    "size": 26,
+    "contentHash": "a2098bd92b10bf8b816d24b7556b1ce8c49a879d130489065ef1051c17e042f6",
+    "language": "TypeScript",
+    "text": true,
+    "classification": "TEST",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  },
+  {
+    "id": "e86ce1e208147d3f7dc3e828e53f8d0473a1ce37",
+    "relativePath": "node_modules/ignored.js",
+    "filename": "ignored.js",
+    "extension": ".js",
+    "size": 19,
+    "contentHash": "9efeaf26ebcddfb7c5fbe5da3645a9995756378eeeb74d900767c73e8ad12451",
+    "language": "JavaScript",
+    "text": true,
+    "classification": "DEPENDENCY",
+    "ignored": true,
+    "ignoreReason": "dependency directory",
+    "indexingStatus": "ignored"
+  },
+  {
+    "id": "7030d0b2f71b999ff89a343de08c414af32fc93a",
+    "relativePath": "package.json",
+    "filename": "package.json",
+    "extension": ".json",
+    "size": 61,
+    "contentHash": "922b55c911dc46a186f6d36fb63515d9fe0380d8beeb09664b80b5003ad359fa",
+    "language": "Unknown",
+    "text": true,
+    "classification": "CONFIG",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  },
+  {
+    "id": "a5cc2925ca8258af241be7e5b0381edf30266302",
+    "relativePath": ".gitignore",
+    "filename": ".gitignore",
+    "extension": "",
+    "size": 18,
+    "contentHash": "c8015948b6eaefde5eaa3862f2fe5ce0245fcde4d6e66f7441dcdcbbed46e652",
+    "language": "Unknown",
+    "text": true,
+    "classification": "UNKNOWN",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "manifest": "package.json",
+    "packageManager": "npm-compatible",
+    "dependencies": {
+      "react": "18.3.1"
+    }
+  }
+]

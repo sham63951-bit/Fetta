@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "ingestionId": "dea3de83-272c-4ea3-8c58-6492070cc2e6",
+  "createdAt": "2026-09-15T15:36:39.649Z",
+  "source": {
+    "archiveName": "mercury-fixture.zip",
+    "sourcePath": "/home/runner/workspace/Fetta-Engineering-Organization/Fetta-Engineering-Organization/artifacts/api-server/mercury-projects/dea3de83-272c-4ea3-8c58-6492070cc2e6/source"
+  },
+  "readiness": {
+    "core": "ready",
+    "secondary": "complete",
+    "timeToCoreReadyMs": 116,
+    "timeToFullIndexMs": 116
+  },
+  "metrics": {
+    "archiveBytes": 1394,
+    "expandedBytes": 150,
+    "fileCount": 5,
+    "indexedFiles": 4,
+    "ignoredFiles": 1,
+    "throughputFilesPerSecond": 43.103448275862064
+  },
+  "filesIndexPath": "mercury/files.json",
+  "structurePath": "mercury/structure.json",
+  "dependenciesPath": "mercury/dependencies.json",
+  "signals": {
+    "languages": [
+      "TypeScript"
+    ],
+    "packageManagers": [],
+    "manifests": [
+      "package.json"
+    ],
+    "monorepo": false
+  },
+  "structure": {
+    "directories": [
+      "node_modules",
+      "src",
+      "tests"
+    ],
+    "sourceDirectories": [
+      "src"
+    ],
+    "testDirectories": [
+      "tests"
+    ],
+    "configurationDirectories": [],
+    "documentationDirectories": [],
+    "buildDirectories": [],
+    "projectRoots": []
+  },
+  "intellimemBoundary": {
+    "emitted": "deterministic_observations_only",
+    "doesNotContain": [
+      "meaning",
+      "decisions",
+      "history",
+      "agent_reasoning"
+    ]
+  }
+}

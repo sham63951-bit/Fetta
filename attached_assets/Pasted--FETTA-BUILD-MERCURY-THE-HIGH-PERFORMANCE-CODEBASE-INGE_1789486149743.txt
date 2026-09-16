@@ -1,0 +1,1404 @@
+# FETTA — BUILD MERCURY, THE HIGH-PERFORMANCE CODEBASE INGESTION ENGINE
+
+We are now moving FETTA from visual prototype toward its real engineering foundation.
+
+Your task is to build **MERCURY**.
+
+Mercury is FETTA's deterministic, high-performance codebase ingestion, extraction, discovery, classification, and indexing subsystem.
+
+This is an important architectural component.
+
+Do not treat it as a normal "file upload feature."
+
+---
+
+# 0. THE FETTA ARCHITECTURE
+
+FETTA is intended to become an AI engineering organization that can understand, remember, develop, pause, resume, and continue working on software projects over very long periods of time.
+
+The conceptual architecture is:
+
+```text
+                         FETTA
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+          MERCURY                    INTELLIMEM
+       "What exists?"              "What do we know?"
+             │                           │
+      Deterministic facts        Persistent intelligence
+             │                           │
+             └─────────────┬─────────────┘
+                           │
+                      PROJECT BRAIN
+                           │
+                Specialist Engineering Agents
+                           │
+                      Coordinator
+                           │
+                       Execution
+                           │
+                      Verification
+                           │
+                      INTELLIMEM
+```
+
+These boundaries are fundamental.
+
+## Mercury
+
+Mercury answers:
+
+> **What physically exists in this project right now?**
+
+## IntelliMem
+
+IntelliMem will answer:
+
+> **What has FETTA learned, decided, verified, changed, rejected, and understood about this project over time?**
+
+## Specialist agents
+
+They will answer domain-specific questions:
+
+> What does this mean from an architecture, backend, database, frontend, security, or testing perspective?
+
+## Coordinator / Project Brain
+
+It will eventually reason across all of this and decide what should happen next.
+
+---
+
+# 1. CRITICAL: MERCURY IS NOT AN AI AGENT
+
+Do NOT use an LLM for Mercury's core work.
+
+Mercury must be deterministic wherever deterministic computation is sufficient.
+
+Do NOT use AI for:
+
+* ZIP extraction
+* file discovery
+* directory traversal
+* file classification
+* hashing
+* file metadata
+* language detection where deterministic detection works
+* ignore rules
+* project statistics
+* manifest detection
+* package-manager detection
+* dependency manifest parsing
+* basic structural analysis
+* basic imports/exports where reliable parsing is available
+
+Do not spend tokens on work a filesystem/parser can perform faster and more reliably.
+
+Mercury is systems engineering.
+
+---
+
+# 2. MERCURY'S PRIMARY OBJECTIVE
+
+Mercury's fundamental objective is:
+
+> **Make an imported codebase available to FETTA as quickly as technically possible, while producing a high-quality deterministic representation of that codebase.**
+
+The target experience is:
+
+```text
+IMPORT
+  ↓
+MERCURY
+  ↓
+FAST INGESTION
+  ↓
+FAST EXTRACTION
+  ↓
+FAST DISCOVERY
+  ↓
+PARALLEL INDEXING
+  ↓
+PROGRESSIVE READINESS
+  ↓
+SPECIALIST AGENTS CAN BEGIN WORK
+```
+
+Do NOT design Mercury as:
+
+```text
+upload
+→ wait
+→ extract everything
+→ wait
+→ scan everything
+→ wait
+→ index everything
+→ finally become usable
+```
+
+Instead design toward:
+
+```text
+stream
+→ safely extract
+→ discover immediately
+→ classify
+→ index in parallel
+→ persist results
+→ expose useful information progressively
+→ continue secondary work in background
+```
+
+The goal is not merely fast completion.
+
+The goal is:
+
+> **How quickly can FETTA begin doing useful work?**
+
+That is a first-class Mercury metric.
+
+---
+
+# 3. CURRENT INPUT: BROWSER ZIP
+
+FETTA is currently browser-first.
+
+Mercury v1 must support:
+
+```text
+Browser
+   ↓
+Repository ZIP
+   ↓
+Server-side ingestion
+   ↓
+Mercury
+```
+
+The browser must NOT individually upload tens of thousands of files.
+
+Do not use:
+
+```text
+<input type="file" multiple>
+```
+
+as the core architecture for repository ingestion.
+
+The repository should arrive as an archive and be processed server-side.
+
+Avoid loading the entire archive into memory.
+
+Use streaming/bounded-memory techniques where appropriate.
+
+---
+
+# 4. FUTURE INPUTS MUST SHARE THE SAME PIPELINE
+
+Mercury should not become permanently coupled to ZIP files.
+
+Eventually FETTA should support:
+
+```text
+ZIP
+Local Windows folder
+Git repository
+GitHub
+GitLab
+Other sources
+      ↓
+    MERCURY
+```
+
+Do NOT implement those integrations now.
+
+Instead establish a clean internal ingestion boundary so different sources can eventually feed Mercury's processing pipeline.
+
+For example, conceptually:
+
+```text
+RepositorySource
+       ↓
+MercuryIngestion
+       ↓
+MercuryIndexer
+       ↓
+ProjectManifest
+```
+
+The exact implementation should follow the existing FETTA architecture rather than introducing unnecessary abstractions.
+
+---
+
+# 5. MERCURY PIPELINE
+
+Build Mercury as a modular pipeline.
+
+At minimum:
+
+```text
+INPUT
+ ↓
+UPLOAD / SOURCE INGESTION
+ ↓
+VALIDATION
+ ↓
+SECURE EXTRACTION
+ ↓
+FILE DISCOVERY
+ ↓
+CLASSIFICATION
+ ↓
+IGNORE / FILTER
+ ↓
+METADATA EXTRACTION
+ ↓
+CONTENT INDEXING
+ ↓
+STRUCTURAL INDEXING
+ ↓
+DEPENDENCY DETECTION
+ ↓
+PROJECT MANIFEST
+ ↓
+PERSISTENCE
+ ↓
+PROGRESSIVE READINESS
+```
+
+Independent work should run concurrently where it is safe and beneficial.
+
+Do not add concurrency simply because "parallel" sounds faster.
+
+Benchmark it.
+
+---
+
+# 6. SECURE EXTRACTION
+
+Treat every uploaded archive as untrusted.
+
+Mercury must protect against:
+
+### Path traversal
+
+Reject or safely normalize entries such as:
+
+```text
+../../etc/passwd
+```
+
+and absolute paths.
+
+### Malicious archives
+
+Protect against:
+
+* decompression bombs
+* extreme compression ratios
+* enormous expanded size
+* excessive file counts
+* pathological directory structures
+* malformed archives
+* invalid filenames
+* unsafe symlinks
+
+### Resource exhaustion
+
+Use reasonable configurable limits for:
+
+* archive size
+* expanded size
+* file count
+* individual file size
+* processing time where appropriate
+
+Do not hard-code arbitrary tiny limits that make legitimate repositories unusable.
+
+Make limits configurable.
+
+### Code execution
+
+NEVER execute repository code during ingestion.
+
+Do not run:
+
+```text
+npm install
+npm run
+pnpm
+yarn
+pip install
+cargo build
+make
+docker
+shell scripts
+```
+
+or equivalent repository commands.
+
+Mercury reads.
+
+Mercury extracts.
+
+Mercury indexes.
+
+Mercury does NOT execute.
+
+---
+
+# 7. STORAGE ISOLATION
+
+Every imported project must have an isolated workspace.
+
+Conceptually:
+
+```text
+projects/
+  <project-id>/
+
+    source/
+      ...
+
+    mercury/
+      manifest
+      files
+      structure
+      dependencies
+      relationships
+      status
+      indexes
+
+    intellimem/
+      ...
+```
+
+The exact storage mechanism should use existing FETTA infrastructure where possible.
+
+Do NOT introduce an unnecessary storage technology.
+
+Do NOT duplicate the source repository unnecessarily.
+
+The raw project source and derived Mercury indexes should remain conceptually separate.
+
+---
+
+# 8. MERCURY'S FILE INDEX
+
+Create a canonical machine-readable representation of discovered files.
+
+Each indexed file should be able to expose useful deterministic metadata such as:
+
+* stable file ID where appropriate
+* relative path
+* filename
+* extension
+* size
+* content hash where useful
+* language
+* text/binary
+* source/test/config/generated classification
+* ignored status
+* ignore reason if ignored
+* relevant timestamps if available
+* indexing status
+
+Do not store enormous duplicated file contents inside metadata records unless required.
+
+The source remains the source.
+
+Indexes describe the source.
+
+---
+
+# 9. DIRECTORY / PROJECT STRUCTURE
+
+Mercury should produce a structural representation of the repository.
+
+It should identify:
+
+* project root
+* directory hierarchy
+* major source directories
+* test directories
+* configuration directories
+* documentation
+* build/output directories
+* likely application boundaries
+* monorepo indicators where detectable
+
+The result should allow another system to answer basic questions without rescanning the filesystem:
+
+> What is this repository made of?
+
+---
+
+# 10. PROJECT SIGNAL DETECTION
+
+Mercury should deterministically detect common project signals.
+
+Examples:
+
+### JavaScript / TypeScript
+
+```text
+package.json
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+bun.lock
+tsconfig.json
+vite.config.*
+next.config.*
+```
+
+### Python
+
+```text
+pyproject.toml
+requirements.txt
+Pipfile
+poetry.lock
+```
+
+### Rust
+
+```text
+Cargo.toml
+Cargo.lock
+```
+
+### Go
+
+```text
+go.mod
+go.sum
+```
+
+### Java
+
+```text
+pom.xml
+build.gradle
+```
+
+### PHP
+
+```text
+composer.json
+composer.lock
+```
+
+### Containers
+
+```text
+Dockerfile
+docker-compose.*
+```
+
+And other common ecosystems.
+
+Do not attempt to enumerate every possible technology.
+
+Build an extensible detector.
+
+---
+
+# 11. DEPENDENCY INDEXING
+
+Where deterministic parsing is reliable, extract:
+
+* package manager
+* dependency manifest
+* dependency names
+* declared versions
+* dev dependencies where applicable
+* workspace/monorepo information where applicable
+
+Do not install dependencies.
+
+Do not resolve the dependency tree by executing package managers.
+
+Do not attempt deep semantic dependency analysis.
+
+That belongs to future specialist systems.
+
+---
+
+# 12. LANGUAGE / FILE CLASSIFICATION
+
+Mercury should classify files efficiently.
+
+At minimum distinguish:
+
+```text
+SOURCE
+TEST
+CONFIG
+DOCUMENTATION
+GENERATED
+BUILD_OUTPUT
+DEPENDENCY
+BINARY
+UNKNOWN
+```
+
+Use extension/path/content signals where useful.
+
+Avoid expensive full-file analysis when lightweight deterministic detection is sufficient.
+
+Do not read huge binary files unnecessarily.
+
+---
+
+# 13. IGNORE SYSTEM
+
+Mercury must avoid wasting resources on irrelevant generated material.
+
+Respect repository ignore mechanisms where appropriate, particularly:
+
+```text
+.gitignore
+```
+
+and recognize common generated/dependency/cache locations such as:
+
+```text
+node_modules
+dist
+build
+.next
+coverage
+.cache
+vendor
+target
+```
+
+Do not blindly ignore unfamiliar directories.
+
+Do not assume every large directory is disposable.
+
+The filtering system must be:
+
+* deterministic
+* explainable
+* testable
+* configurable
+
+Record:
+
+```text
+path
+→ ignored
+→ reason
+```
+
+where practical.
+
+---
+
+# 14. CONTENT INDEXING
+
+Mercury should make source content efficiently accessible to future FETTA systems.
+
+Design for:
+
+* efficient file retrieval
+* content hashing
+* incremental re-indexing
+* avoiding repeated reads
+* bounded memory
+* efficient batching
+
+Where useful, produce lightweight content metadata.
+
+Do NOT attempt to summarize code with an LLM.
+
+Do NOT generate embeddings as part of Mercury v1.
+
+Do NOT build semantic code understanding here.
+
+That belongs above Mercury.
+
+---
+
+# 15. STRUCTURAL RELATIONSHIPS
+
+Where inexpensive and reliable, detect deterministic relationships such as:
+
+* imports
+* exports
+* internal module references
+* obvious file dependencies
+
+Do not attempt perfect compiler-grade semantic analysis for every programming language.
+
+The principle is:
+
+> **Useful structural information quickly beats theoretically complete analysis slowly.**
+
+Design this portion so additional language-specific parsers can be added later.
+
+---
+
+# 16. HASHING + INCREMENTAL PROCESSING
+
+Mercury must support efficient recognition of unchanged content.
+
+Where useful:
+
+```text
+file
+ ↓
+content identity/hash
+ ↓
+compare with previous index
+ ↓
+unchanged → reuse
+changed → reprocess
+new → process
+deleted → remove from current index
+```
+
+This becomes extremely important later when a developer returns to an existing project.
+
+Mercury should eventually allow FETTA to answer:
+
+> "What physically changed since the last time I saw this repository?"
+
+Do not build an enormous distributed caching system.
+
+Implement a clean, practical foundation.
+
+---
+
+# 17. RESUMABILITY
+
+If ingestion fails or is interrupted:
+
+```text
+92% complete
+     ↓
+failure
+     ↓
+resume
+```
+
+should be possible where technically practical.
+
+Avoid throwing away already completed deterministic work.
+
+Persist enough state to understand:
+
+* current phase
+* completed work
+* pending work
+* failed work
+* retryable work
+
+Do not create an unnecessarily complicated distributed job system.
+
+Keep v1 robust and understandable.
+
+---
+
+# 18. PROGRESSIVE READINESS
+
+Mercury must distinguish between:
+
+### Core readiness
+
+Enough information exists for FETTA to begin understanding the project:
+
+```text
+source available
++
+directory structure discovered
++
+files discovered
++
+essential metadata indexed
++
+project manifest persisted
+```
+
+### Secondary indexing
+
+Additional work may continue afterward:
+
+```text
+deep structural relationships
+additional metadata
+language-specific analysis
+secondary indexes
+```
+
+This allows FETTA to begin useful work without waiting for every optional index.
+
+Expose real status.
+
+For example:
+
+```text
+UPLOADING
+VALIDATING
+EXTRACTING
+DISCOVERING
+INDEXING
+READY
+FAILED
+```
+
+Report actual progress where possible:
+
+* bytes received
+* files discovered
+* files indexed
+* files ignored
+* current phase
+* elapsed time
+* throughput
+
+Never fake progress.
+
+---
+
+# 19. PERFORMANCE ENGINEERING
+
+"Speed of light" is the product goal.
+
+Translate that into actual engineering.
+
+Avoid:
+
+* loading entire repositories into RAM
+* sequentially processing independent files
+* unnecessary copying
+* unnecessary serialization
+* unnecessary database round trips
+* repeated directory traversal
+* repeated parsing
+* redundant hashing
+* blocking the whole pipeline on secondary work
+
+Use:
+
+* streaming
+* bounded concurrency
+* batching
+* efficient filesystem operations
+* incremental processing
+* caching/reuse
+* progressive readiness
+
+But:
+
+**Do not blindly optimize. Measure.**
+
+---
+
+# 20. PERFORMANCE BENCHMARKS
+
+Create a deterministic benchmark fixture representing a realistic repository.
+
+Measure:
+
+* repository size
+* number of files
+* upload throughput where measurable
+* extraction time
+* extraction throughput
+* discovery time
+* discovery throughput
+* indexing time
+* indexing throughput
+* files/second
+* peak memory where practical
+* total ingestion time
+* time to core readiness
+* time to complete indexing
+
+The most important new metric is:
+
+> **Time to useful FETTA readiness.**
+
+We care about:
+
+```text
+T_upload
+T_extract
+T_discover
+T_core_ready
+T_full_index
+```
+
+Do not claim "speed of light" without measurements.
+
+The benchmark becomes our baseline for future optimization.
+
+---
+
+# 21. INTELLIMEM — PROTECT THE FUTURE ARCHITECTURE
+
+IntelliMem is NOT being fully implemented in this task.
+
+However, its architectural boundary MUST be preserved.
+
+IntelliMem is one of FETTA's core differentiators.
+
+It is intended to allow FETTA to maintain a long-lived intelligent relationship with a project:
+
+```text
+Trust FETTA
+     ↓
+Understand project
+     ↓
+Develop project
+     ↓
+Record decisions
+     ↓
+Verify work
+     ↓
+Pause
+     ↓
+Days / months / years
+     ↓
+Return
+     ↓
+Detect changes
+     ↓
+Recall previous understanding
+     ↓
+Reconcile
+     ↓
+Continue
+```
+
+The developer should not need to explain the entire project again every time FETTA resumes work.
+
+---
+
+# 22. WHAT INTELLIMEM WILL EVENTUALLY REMEMBER
+
+Do NOT build all of this now.
+
+But Mercury's architecture must not prevent it.
+
+Future IntelliMem should be capable of retaining things such as:
+
+* project goals
+* requirements
+* constraints
+* developer instructions
+* architectural decisions
+* reasons behind decisions
+* discoveries
+* agent findings
+* unresolved problems
+* completed work
+* failed approaches
+* rejected approaches
+* verification results
+* important conversations
+* project history
+* current project state
+* agent responsibilities
+* trust/permission boundaries
+* dependencies between decisions
+* changes over time
+
+This is NOT merely chat history.
+
+---
+
+# 23. INTELLIMEM MUST DISTINGUISH KNOWLEDGE TYPES
+
+The future memory architecture must distinguish concepts such as:
+
+### FACT
+
+```text
+PostgreSQL is used by the backend.
+```
+
+### OBSERVATION
+
+```text
+Appointment creation may have a concurrency issue.
+```
+
+### REQUIREMENT
+
+```text
+Appointments must never overlap.
+```
+
+### DECISION
+
+```text
+Use database-level protection for overlap prevention.
+```
+
+### REASON
+
+```text
+Application-only checking does not guarantee concurrency safety.
+```
+
+### VERIFICATION
+
+```text
+Concurrent creation was tested and the behavior was verified.
+```
+
+### REJECTED APPROACH
+
+```text
+Application-only checking was previously attempted and rejected.
+```
+
+These are different types of knowledge.
+
+Do not collapse them into a single generic "memory" record.
+
+---
+
+# 24. INTELLIMEM MUST BE TEMPORAL
+
+FETTA must eventually understand project history.
+
+For example:
+
+```text
+September 2026
+    ↓
+Repository imported
+    ↓
+Mercury indexes project
+    ↓
+Agents investigate
+    ↓
+IntelliMem records knowledge
+    ↓
+Developer changes architecture
+    ↓
+Tests verify behavior
+    ↓
+FETTA records result
+    ↓
+Project paused
+    ↓
+6 months later
+    ↓
+Repository changes
+    ↓
+Mercury detects physical changes
+    ↓
+IntelliMem recalls historical understanding
+    ↓
+FETTA reconciles old knowledge with new reality
+    ↓
+Continue
+```
+
+Do not make future memory dependent on a single conversation.
+
+---
+
+# 25. MERCURY → INTELLIMEM BOUNDARY
+
+This is one of the most important rules in this task.
+
+Mercury should produce **deterministic observations**.
+
+For example:
+
+```text
+Mercury:
+
+src/auth/login.ts exists
+src/auth/login.ts changed
+package.json contains dependency X
+database/migrations contains 17 files
+PostgreSQL configuration exists
+```
+
+IntelliMem may later transform project activity and agent reasoning into knowledge such as:
+
+```text
+"We introduced authentication through this module because..."
+```
+
+Mercury should NOT decide why something exists.
+
+Mercury reports reality.
+
+IntelliMem preserves meaning and history.
+
+---
+
+# 26. DO NOT TURN INTELLIMEM INTO "JUST A VECTOR DATABASE"
+
+Do not implement:
+
+```text
+everything
+ ↓
+embeddings
+ ↓
+vector database
+ ↓
+memory
+```
+
+That is not sufficient for FETTA.
+
+The eventual architecture should be able to combine:
+
+```text
+CURRENT STATE
+KNOWLEDGE
+DECISIONS
+EVENTS
+HISTORY
+PROVENANCE
+RELATIONSHIPS
+```
+
+with appropriate retrieval mechanisms.
+
+For this task:
+
+**Establish only the clean boundary/interface necessary for Mercury to coexist with future IntelliMem.**
+
+Do not prematurely implement an elaborate memory system.
+
+---
+
+# 27. FUTURE EXECUTION → INTELLIMEM LOOP
+
+FETTA will eventually work like:
+
+```text
+UNDERSTAND
+   ↓
+PLAN
+   ↓
+CHANGE CODE
+   ↓
+TEST
+   ↓
+VERIFY ACTUAL BEHAVIOR
+   ↓
+RECORD RESULT
+   ↓
+INTELLIMEM
+```
+
+If an approach fails, the future system should remember that.
+
+If an approach is rejected, the future system should remember why.
+
+This prevents FETTA from repeatedly making the same mistakes.
+
+Design Mercury so it can participate in this larger loop without becoming responsible for it.
+
+---
+
+# 28. SPECIALIST AGENT CONTRACT
+
+Future specialists should consume Mercury's output rather than repeatedly rediscovering basic repository facts.
+
+Eventually:
+
+```text
+                     PROJECT BRAIN
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+          MERCURY                    INTELLIMEM
+             │                           │
+             └─────────────┬─────────────┘
+                           │
+       ┌──────────────┬────┴────┬──────────────┐
+       │              │         │              │
+   ARCHITECT        DB       BACKEND       FRONTEND
+       │              │         │              │
+   SECURITY         TESTING    future specialists
+       │              │         │
+       └──────────────┴─────────┘
+                    │
+               COORDINATOR
+                    │
+                EXECUTION
+```
+
+A specialist should not need to waste its context discovering:
+
+> "There are 14,000 files and package.json exists."
+
+Mercury should already provide those facts.
+
+---
+
+# 29. CURRENT FETTA UI
+
+The current FETTA solar-system interface is the visual identity.
+
+PRESERVE IT.
+
+It should remain:
+
+* dark
+* cinematic
+* premium
+* atmospheric
+* restrained
+* intelligent
+* mysterious
+* powerful
+* trustworthy
+
+The solar system represents the engineering organization.
+
+Do not replace it with a generic upload dashboard.
+
+Do not create a conventional SaaS admin panel.
+
+Mercury activity should eventually integrate naturally into this visual system.
+
+---
+
+# 30. WHAT YOU ARE AUTHORIZED TO CHANGE
+
+You MAY change:
+
+* frontend code required for Mercury
+* backend ingestion code
+* ZIP upload handling
+* extraction
+* project storage required by Mercury
+* Mercury indexing
+* relevant database models if genuinely required
+* status/progress APIs
+* tests
+* benchmark tooling
+* configuration directly required by Mercury
+* minimal interfaces required to preserve the future IntelliMem boundary
+
+You MUST NOT change:
+
+* unrelated UI
+* Tauri / Windows desktop implementation
+* specialist AI agents
+* Coordinator intelligence
+* autonomous coding loops
+* GitHub integrations
+* GitLab integrations
+* external repository integrations
+* unrelated database architecture
+* unrelated APIs
+* authentication architecture unless Mercury genuinely requires it
+* product concept
+* visual identity
+
+Do not install dependencies unless there is a concrete technical reason.
+
+Prefer existing dependencies and infrastructure.
+
+---
+
+# 31. ENGINEERING DISCIPLINE
+
+Follow:
+
+```text
+INSPECT
+   ↓
+UNDERSTAND
+   ↓
+ESTABLISH CONSTRAINTS
+   ↓
+FORM HYPOTHESIS
+   ↓
+MINIMAL IMPLEMENTATION
+   ↓
+TEST
+   ↓
+BENCHMARK
+   ↓
+VERIFY ACTUAL BEHAVIOR
+   ↓
+STOP
+```
+
+Do not:
+
+* blindly patch errors
+* refactor unrelated code
+* redesign architecture because another approach looks nicer
+* add speculative infrastructure
+* endlessly troubleshoot
+* declare success because compilation passes
+
+If something fails, determine whether it is:
+
+1. an implementation problem,
+2. a configuration problem,
+3. an architectural mismatch,
+4. or a misunderstanding of the requirement.
+
+Then address the actual problem.
+
+---
+
+# 32. COST / TOOL DISCIPLINE
+
+This project is being built using agentic development tools.
+
+Do not burn credits unnecessarily.
+
+Before each significant action ask:
+
+> Is this necessary to achieve Mercury's current objective?
+
+Avoid:
+
+* broad codebase exploration
+* reading thousands of irrelevant lines
+* repeated searches
+* speculative fixes
+* unnecessary package installation
+* unrelated cleanup
+* repeated verification of unchanged code
+
+Prefer:
+
+```text
+inspect minimum relevant files
+→ make focused change
+→ verify
+→ continue
+```
+
+If the implementation is complete and verified, STOP.
+
+---
+
+# 33. TESTING
+
+At minimum test:
+
+### Ingestion
+
+* valid ZIP
+* empty repository
+* large repository
+* nested directories
+
+### Security
+
+* path traversal archive
+* absolute path archive
+* malformed archive
+* excessive expansion
+* unsafe symlink if applicable
+
+### Filtering
+
+* .gitignore
+* dependency directories
+* generated directories
+* binary files
+
+### Indexing
+
+* common languages
+* package manifests
+* lockfiles
+* test files
+* configuration files
+
+### Incremental behavior
+
+* unchanged repository
+* modified file
+* added file
+* deleted file
+
+### Failure handling
+
+* interrupted ingestion
+* extraction failure
+* indexing failure
+* retry/resume behavior
+
+Do not create an enormous test suite for hypothetical edge cases.
+
+Cover the actual Mercury contract.
+
+---
+
+# 34. DEFINITION OF DONE
+
+Mercury v1 is complete when:
+
+1. A developer can import a repository ZIP through FETTA.
+2. The repository does not require individual browser file uploads.
+3. The archive is handled using bounded-memory/streaming techniques where appropriate.
+4. Extraction is secure.
+5. Repository code is never executed during ingestion.
+6. Files are discovered efficiently.
+7. Files are classified deterministically.
+8. Ignore rules are respected.
+9. Useful metadata is indexed.
+10. Repository structure is indexed.
+11. Dependency manifests are detected and parsed where practical.
+12. A canonical Project Manifest/Index is persisted.
+13. Mercury exposes real ingestion status.
+14. Mercury supports progressive readiness.
+15. Mercury has a foundation for incremental re-indexing.
+16. Mercury has practical resumability/failure handling.
+17. Mercury produces benchmark measurements.
+18. Future specialist agents can consume Mercury's output.
+19. Mercury remains independent from IntelliMem.
+20. The IntelliMem boundary remains clean and future-proof.
+21. Existing FETTA visual identity is preserved.
+22. Tests pass.
+23. The actual running behavior has been verified.
+24. No unrelated architecture has been changed.
+
+---
+
+# FINAL PRINCIPLE
+
+Do not think of Mercury as:
+
+> "FETTA's ZIP uploader."
+
+Think of Mercury as:
+
+> **FETTA's high-speed sensory system.**
+
+It takes the physical codebase and turns it into structured reality.
+
+Then:
+
+**Mercury knows what exists.**
+
+**IntelliMem remembers what FETTA knows.**
+
+**Specialists understand what it means.**
+
+**The Coordinator decides what to do.**
+
+**Execution changes the project.**
+
+**Verification determines whether the change actually worked.**
+
+**IntelliMem preserves the result.**
+
+That complete loop is what will eventually make FETTA fundamentally different from a normal coding agent.
+
+Build Mercury with that future in mind, without prematurely building the rest of the system.

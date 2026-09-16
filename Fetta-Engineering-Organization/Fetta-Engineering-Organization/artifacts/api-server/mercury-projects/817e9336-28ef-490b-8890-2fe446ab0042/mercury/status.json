@@ -1,0 +1,14 @@
+{
+  "ingestionId": "817e9336-28ef-490b-8890-2fe446ab0042",
+  "phase": "FAILED",
+  "archiveName": "mercury-fixture.zip",
+  "archiveBytes": 0,
+  "filesDiscovered": 0,
+  "filesIndexed": 0,
+  "filesIgnored": 0,
+  "expandedBytes": 0,
+  "elapsedMs": 0,
+  "throughputFilesPerSecond": 0,
+  "updatedAt": "2026-09-15T15:34:46.011Z",
+  "error": "ENOENT: no such file or directory, open '/home/runner/workspace/Fetta-Engineering-Organization/Fetta-Engineering-Organization/artifacts/api-server/mercury-projects/817e9336-28ef-490b-8890-2fe446ab0042/upload/repository.zip'"
+}

@@ -1,0 +1,13 @@
+{
+  "ingestionId": "e33d9938-0fd3-4807-9588-267659f79970",
+  "phase": "READY",
+  "archiveName": "notely-pwa.zip",
+  "archiveBytes": 8132,
+  "filesDiscovered": 4,
+  "filesIndexed": 4,
+  "filesIgnored": 0,
+  "expandedBytes": 24603,
+  "elapsedMs": 336,
+  "throughputFilesPerSecond": 11.904761904761903,
+  "updatedAt": "2026-09-15T21:25:26.669Z"
+}

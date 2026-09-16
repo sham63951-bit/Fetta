@@ -283,6 +283,7 @@ router.post("/projects/:projectId/tasks", async (req, res) => {
     status: "ready",
     verificationState: "not_started",
     summary: null,
+    verificationEvidence: null,
     createdAt: timestamp,
     updatedAt: timestamp,
   } as const;
@@ -362,7 +363,21 @@ router.post("/projects/:projectId/tasks/:taskId/run", async (req, res) => {
         summary: result.summary,
         verificationEvidence: {
           passed: result.verificationPassed,
-          evidence: result.evidence,
+          evidence: {
+            verificationType: typeof result.evidence.verificationType === "string"
+              ? result.evidence.verificationType
+              : "orchestration",
+            command: typeof result.evidence.command === "string" ? result.evidence.command : undefined,
+            exitCode: typeof result.evidence.exitCode === "number" ? result.evidence.exitCode : undefined,
+            stdout: typeof result.evidence.stdout === "string" ? result.evidence.stdout : undefined,
+            stderr: typeof result.evidence.stderr === "string" ? result.evidence.stderr : undefined,
+            filesVerified: Array.isArray(result.evidence.filesVerified)
+              ? result.evidence.filesVerified.filter((file): file is string => typeof file === "string")
+              : [],
+            timestamp: typeof result.evidence.timestamp === "string"
+              ? result.evidence.timestamp
+              : new Date().toISOString(),
+          },
           filesModified: result.filesModified,
         },
         updatedAt: now(),

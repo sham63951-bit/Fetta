@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "ingestionId": "e33d9938-0fd3-4807-9588-267659f79970",
+  "createdAt": "2026-09-15T21:25:26.668Z",
+  "source": {
+    "archiveName": "notely-pwa.zip",
+    "sourcePath": "/home/runner/workspace/Fetta-Engineering-Organization/Fetta-Engineering-Organization/artifacts/api-server/mercury-projects/e33d9938-0fd3-4807-9588-267659f79970/source"
+  },
+  "readiness": {
+    "core": "ready",
+    "secondary": "complete",
+    "timeToCoreReadyMs": 336,
+    "timeToFullIndexMs": 336
+  },
+  "metrics": {
+    "archiveBytes": 8132,
+    "expandedBytes": 24603,
+    "fileCount": 4,
+    "indexedFiles": 4,
+    "ignoredFiles": 0,
+    "throughputFilesPerSecond": 11.904761904761903
+  },
+  "filesIndexPath": "mercury/files.json",
+  "structurePath": "mercury/structure.json",
+  "dependenciesPath": "mercury/dependencies.json",
+  "signals": {
+    "languages": [
+      "HTML",
+      "JavaScript"
+    ],
+    "packageManagers": [],
+    "manifests": [],
+    "monorepo": false
+  },
+  "structure": {
+    "directories": [
+      "notely-pwa"
+    ],
+    "sourceDirectories": [],
+    "testDirectories": [],
+    "configurationDirectories": [],
+    "documentationDirectories": [],
+    "buildDirectories": [],
+    "projectRoots": []
+  },
+  "intellimemBoundary": {
+    "emitted": "deterministic_observations_only",
+    "doesNotContain": [
+      "meaning",
+      "decisions",
+      "history",
+      "agent_reasoning"
+    ]
+  }
+}

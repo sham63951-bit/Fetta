@@ -1,0 +1,17 @@
+{
+  "directories": [
+    "node_modules",
+    "src",
+    "tests"
+  ],
+  "sourceDirectories": [
+    "src"
+  ],
+  "testDirectories": [
+    "tests"
+  ],
+  "configurationDirectories": [],
+  "documentationDirectories": [],
+  "buildDirectories": [],
+  "projectRoots": []
+}

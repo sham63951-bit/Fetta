@@ -1,0 +1,13 @@
+{
+  "ingestionId": "0724128b-aa04-4da1-a741-3461feefb567",
+  "phase": "EXTRACTING",
+  "archiveName": "mercury-fixture.zip",
+  "archiveBytes": 1394,
+  "filesDiscovered": 5,
+  "filesIndexed": 0,
+  "filesIgnored": 0,
+  "expandedBytes": 0,
+  "elapsedMs": 0,
+  "throughputFilesPerSecond": 0,
+  "updatedAt": "2026-09-15T15:35:35.838Z"
+}

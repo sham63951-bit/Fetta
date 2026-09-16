@@ -1,0 +1,13 @@
+{
+  "ingestionId": "fdf21732-6e00-4ac6-8041-5e3eb6983a12",
+  "phase": "READY",
+  "archiveName": "mercury-proxy-fixture.zip",
+  "archiveBytes": 1394,
+  "filesDiscovered": 5,
+  "filesIndexed": 4,
+  "filesIgnored": 1,
+  "expandedBytes": 150,
+  "elapsedMs": 182,
+  "throughputFilesPerSecond": 27.472527472527474,
+  "updatedAt": "2026-09-15T15:38:04.288Z"
+}

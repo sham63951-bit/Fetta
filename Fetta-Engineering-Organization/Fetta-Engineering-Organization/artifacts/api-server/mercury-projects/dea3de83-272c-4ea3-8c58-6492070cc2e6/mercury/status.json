@@ -1,0 +1,13 @@
+{
+  "ingestionId": "dea3de83-272c-4ea3-8c58-6492070cc2e6",
+  "phase": "READY",
+  "archiveName": "mercury-fixture.zip",
+  "archiveBytes": 1394,
+  "filesDiscovered": 5,
+  "filesIndexed": 4,
+  "filesIgnored": 1,
+  "expandedBytes": 150,
+  "elapsedMs": 116,
+  "throughputFilesPerSecond": 43.103448275862064,
+  "updatedAt": "2026-09-15T15:36:39.651Z"
+}

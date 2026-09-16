@@ -1,0 +1,54 @@
+[
+  {
+    "id": "07c82832515fbb00d51233dee31a08909a665de1",
+    "relativePath": "notely-pwa/manifest.json",
+    "filename": "manifest.json",
+    "extension": ".json",
+    "size": 452,
+    "contentHash": "2c757bf185b9e36a8e69439220225b7b1c7eb3f09e5ebc5431e4a8a4261d54cd",
+    "language": "Unknown",
+    "text": true,
+    "classification": "CONFIG",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  },
+  {
+    "id": "eadad58ee2b48319cf483f772b8361b69c6d794c",
+    "relativePath": "notely-pwa/icon.svg",
+    "filename": "icon.svg",
+    "extension": ".svg",
+    "size": 802,
+    "contentHash": "308d17bb05b01deeffb248a9b492380622469f372ca871f3713c1defe2111885",
+    "language": "Unknown",
+    "text": true,
+    "classification": "UNKNOWN",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  },
+  {
+    "id": "4b42dda867e72b38cbdb4ce648b4a5b3dcf0b74d",
+    "relativePath": "notely-pwa/index.html",
+    "filename": "index.html",
+    "extension": ".html",
+    "size": 22364,
+    "contentHash": "90e34422d1466d344a2a8166dd22a9adffce5d1ca35c95c7a7e7dc39c5fcd646",
+    "language": "HTML",
+    "text": true,
+    "classification": "SOURCE",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  },
+  {
+    "id": "fd65a1a10e5cb83970e16db7b76861623eb29eaf",
+    "relativePath": "notely-pwa/sw.js",
+    "filename": "sw.js",
+    "extension": ".js",
+    "size": 985,
+    "contentHash": "b72c1da0c1714efd29a798fd5c27164bbaa3f61f265645b1fe87ba125c65631e",
+    "language": "JavaScript",
+    "text": true,
+    "classification": "SOURCE",
+    "ignored": false,
+    "indexingStatus": "indexed"
+  }
+]

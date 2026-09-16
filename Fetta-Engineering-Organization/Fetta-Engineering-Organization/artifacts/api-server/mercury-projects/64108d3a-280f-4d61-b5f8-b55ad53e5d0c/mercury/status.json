@@ -1,0 +1,14 @@
+{
+  "ingestionId": "64108d3a-280f-4d61-b5f8-b55ad53e5d0c",
+  "phase": "FAILED",
+  "archiveName": "traversal.zip",
+  "archiveBytes": 142,
+  "filesDiscovered": 0,
+  "filesIndexed": 0,
+  "filesIgnored": 0,
+  "expandedBytes": 0,
+  "elapsedMs": 23,
+  "throughputFilesPerSecond": 0,
+  "updatedAt": "2026-09-15T15:36:58.078Z",
+  "error": "Path traversal detected: ../escape.txt"
+}
